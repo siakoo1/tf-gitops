@@ -1,0 +1,37 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: "terraform"
+customActions:
+  - name: custom-render
+    containers:
+      - image: terraform-image
+        name: render
+        command: ["/bin/sh"]
+        args: 
+          - "-c"
+          - |
+            echo "Sample manifest rendered content" > manifest.txt
+            gsutil cp manifest.txt $CLOUD_DEPLOY_OUTPUT_GCS_PATH/manifest.txt
+            echo {\"resultStatus\": \"SUCCEEDED\", \"manifestFile\": \"$CLOUD_DEPLOY_OUTPUT_GCS_PATH/manifest.txt\"} > results.json
+            gsutil cp results.json $CLOUD_DEPLOY_OUTPUT_GCS_PATH/results.json
+
+  - name: custom-deploy
+    containers:
+      - image: terraform-image
+        name: test-render-show
+        command: ["/bin/sh"]
+        args: ["deploy.sh"]
+          # - "-c"
+          # - |
+          #   git clone 
+          #   terraform init
+          #   echo $CLOUD_DEPLOY_TARGET
+          #   if [ "$CLOUD_DEPLOY_TARGET" = "tf-plan" ]; then
+          #     terraform plan
+          #   else
+          #     terraform apply -auto-approve
+          #   fi
+          #   [ "$?" = 0 ] && RESULT="SUCCEEDED" || RESULT="FAILED"
+          #   echo {\"resultStatus\": \"$RESULT\"} > results.json
+          #   gsutil cp results.json $CLOUD_DEPLOY_OUTPUT_GCS_PATH/results.json

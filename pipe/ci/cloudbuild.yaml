@@ -1,0 +1,31 @@
+steps:
+  - id: build-artifact-image
+    name: "gcr.io/cloud-builders/docker"
+    args: [ 
+      "build", 
+      "-t", 
+      "$_IMAGE_NAME:$SHORT_SHA", 
+      "tf-container"
+    ]
+    images: [
+      "$_IMAGE_NAME:$SHORT_SHA"
+    ]
+
+  # - id: run-cloud-deploy
+  #   name: "gcr.io/google.com/cloudsdktool/google-cloud-cli:alpine"
+  #   entrypoint: "/bin/sh"
+
+  #   args:
+  #     - "-c"
+  #     - |-
+  #       gcloud deploy releases create release-$SHORT_SHA-'$$DATE'-'$$TIME' --region=us-central1 \
+  #                                                                          --delivery-pipeline=tf-test-pipeline \
+  #                                                                          --images=terraform-image=$_IMAGE_NAME:$SHORT_SHA
+
+# [ 
+#       "deploy", 
+#       "releases", 
+#       "create", 
+#       "release-$SHORT_SHA-'$$DATE'-'$$TIME'",  
+#       "--images=terraform-image=$_IMAGE_NAME:$SHORT_SHA"
+#     ]
